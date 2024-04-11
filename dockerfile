@@ -7,8 +7,11 @@ WORKDIR /app
 # Copiez le code de l'application dans le conteneur
 COPY src/ .
 
-# Installez les dépendances Python
-RUN pip install --no-cache-dir requests
+# Installez les dépendances
+RUN pip install flask requests
 
-# Commande par défaut à exécuter lorsque le conteneur démarre
-CMD ["python", "main.py"]
+# Exposez le port sur lequel votre application Flask fonctionne
+EXPOSE 5000
+
+# Commande pour exécuter votre application
+CMD ["python", "weather_api.py"]
