@@ -13,5 +13,7 @@ RUN pip install flask requests
 # Exposez le port sur lequel votre application Flask fonctionne
 EXPOSE 5000
 
+ENV FLASK_APP=main.py
+
 # Commande pour exécuter votre application
 CMD ["python", "weather_api.py"]
