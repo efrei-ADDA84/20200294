@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: CI
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build_and_deploy:
+  build_and_push:
     runs-on: ubuntu-latest
     
     steps:
@@ -24,28 +24,50 @@ jobs:
     # Push Docker image to Docker Hub
     - name: Push Docker image to Docker Hub
       run: docker push zeork7/test-lab1:latest
-    
-    # Login to Azure
-    - name: Login to Azure
+
+    # Login to Azure Container Registry
+    - name: Login to Azure Container Registry
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     # Login to Azure Container Registry
-    - name: Login to Azure Container Registry
-      run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login ${{ secrets.REGISTRY_LOGIN_SERVER }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+    - name: Log in to Azure Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    # Push Docker image to Azure Container Registry
-    - name: Push Docker image to ACR
-      run: docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/20200294:v1
+    # Build and push Docker image to Azure Container Registry
+    - name: Build and push Docker image to ACR
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ secrets.REGISTRY_LOGIN_SERVER }}/20200294:v1
+        
+  deploy:
+    runs-on: ubuntu-latest 
 
-    # Deploy to Azure Container Instances
-    - name: Deploy to Azure Container Instances
+    steps: 
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 'Deploy to Azure Container Instance'
       uses: azure/aci-deploy@v1
       with:
         resource-group: ${{ secrets.RESOURCE_GROUP }}
         dns-name-label: devops-20200294
         image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/20200294:v1
-        location: francecentral
         name: 20200294
-        containers: 1
+        location: 'francecentral'
+        registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        registry-username: ${{ secrets.REGISTRY_USERNAME }}
+        registry-password: ${{ secrets.REGISTRY_PASSWORD }}
