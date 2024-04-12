@@ -1,11 +1,12 @@
-name: CI
+name: Build and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
     
     steps:
@@ -21,6 +22,28 @@ jobs:
       run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
     # Push Docker image to Docker Hub
-    - name: Push Docker image
+    - name: Push Docker image to Docker Hub
       run: docker push zeork7/test-lab1:latest
 
+    # Login to Azure Container Registry
+    - name: Login to Azure Container Registry
+      run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login ${{ secrets.REGISTRY_LOGIN_SERVER }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+
+    # Tag Docker image for Azure Container Registry
+    - name: Tag Docker image for ACR
+      run: docker tag zeork7/test-lab1:latest ${{ secrets.REGISTRY_LOGIN_SERVER }}/20200294:v1
+
+    # Push Docker image to Azure Container Registry
+    - name: Push Docker image to ACR
+      run: docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/20200294:v1
+
+    # Deploy to Azure Container Instances
+    - name: Deploy to Azure Container Instances
+      uses: azure/aci-deploy@v1
+      with:
+        resource-group: ${{ secrets.RESOURCE_GROUP }}
+        dns-name-label: devops-20200294
+        image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/20200294:v1
+        location: francecentral
+        name: 20200294
+        containers: 1
