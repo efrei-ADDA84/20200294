@@ -37,11 +37,11 @@ jobs:
 
     # Tag Docker image for Azure Container Registry
     - name: Tag Docker image for ACR
-      run: docker tag zeork7/test-lab1:latest ${{ secrets.REGISTRY_LOGIN_SERVER }}/20200294:v1
+      run: docker tag zeork7/test-lab1:latest efreidevops.azurecr.io/20200294:v1
 
     # Push Docker image to Azure Container Registry
     - name: Push Docker image to ACR
-      run: docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/20200294:v1
+      run: docker push efreidevops.azurecr.io/20200294:v1
 
     # Deploy to Azure Container Instances
     - name: Deploy to Azure Container Instances
