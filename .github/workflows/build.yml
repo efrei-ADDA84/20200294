@@ -24,6 +24,12 @@ jobs:
     # Push Docker image to Docker Hub
     - name: Push Docker image to Docker Hub
       run: docker push zeork7/test-lab1:latest
+    
+    # Login to Azure
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     # Login to Azure Container Registry
     - name: Login to Azure Container Registry
