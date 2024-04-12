@@ -28,7 +28,11 @@ jobs:
     # Extract latest commit hash
     - name: Extract commit hash
       id: extract_hash
-      run: echo "::set-output name=hash::$(git rev-parse --short HEAD)"
+      run: |
+        hash=$(git rev-parse --short HEAD)
+        echo "Commit hash: $hash"
+        echo "::set-output name=hash::$hash"
+
 
     # Login to Azure Container Registry
     - name: Login to Azure Container Registry
