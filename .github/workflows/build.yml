@@ -25,7 +25,7 @@ jobs:
     - name: Push Docker image to Docker Hub
       run: docker push zeork7/test-lab1:latest
 
-     Login to Azure
+    # Login to Azure
     - name: Login to Azure
       uses: azure/login@v1
       with:
