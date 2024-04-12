@@ -11,7 +11,7 @@ COPY src/ .
 RUN pip install flask requests
 
 # Exposez le port sur lequel votre application Flask fonctionne
-EXPOSE 5000
+EXPOSE 8081
 
 ENV FLASK_APP=main.py
 
