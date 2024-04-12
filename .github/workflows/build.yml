@@ -25,23 +25,13 @@ jobs:
     - name: Push Docker image to Docker Hub
       run: docker push zeork7/test-lab1:latest
 
-    # Login to Azure
-    - name: Login to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
     # Login to Azure Container Registry
     - name: Login to Azure Container Registry
       run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login ${{ secrets.REGISTRY_LOGIN_SERVER }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
 
-    # Tag Docker image for Azure Container Registry
-    - name: Tag Docker image for ACR
-      run: docker tag zeork7/test-lab1:latest efreidevops.azurecr.io/20200294:v1
-
     # Push Docker image to Azure Container Registry
     - name: Push Docker image to ACR
-      run: docker push efreidevops.azurecr.io/20200294:v1
+      run: docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/20200294:v1
 
     # Deploy to Azure Container Instances
     - name: Deploy to Azure Container Instances
