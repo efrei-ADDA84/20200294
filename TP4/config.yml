@@ -1,0 +1,25 @@
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+        # Login to Azure Container Registry
+      - name: Login to Azure Container Registry
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set Terraform variables
+        uses: actions/github-script@v5
+        with:
+          script: |
+            process.env.TF_VAR_subscription_id = ${{ secrets.SUBSCRIPTION_ID }}
+            process.env.TF_VAR_resource_group = ${{ secrets.RESOURCE_GROUP }}
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform plan
+        run: terraform plan
